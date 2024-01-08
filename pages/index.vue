@@ -8,17 +8,29 @@ const data6 = ref(null);
 const data7 = ref(null);
 const data8 = ref(null);
 const fetchData = async () => {
+  // process.client or server false makes no difference
   if (process.client) {
-    data1.value = await useFetch(
+    const response1 = await useFetch(
       "https://jsonplaceholder.typicode.com/todos/1",
       {
         server: false,
       }
     );
+    data1.value = response1.data;
   }
-  data2.value = await useFetch("https://jsonplaceholder.typicode.com/todos/2");
-  data3.value = await useFetch("https://jsonplaceholder.typicode.com/todos/3");
-  data4.value = await useFetch("https://jsonplaceholder.typicode.com/todos/4");
+  const response2 = await useFetch(
+    "https://jsonplaceholder.typicode.com/todos/2"
+  );
+  data2.value = response2.data;
+
+  const response3 = await useFetch(
+    "https://jsonplaceholder.typicode.com/todos/3"
+  );
+  data3.value = response3.data;
+  const response4 = await useFetch(
+    "https://jsonplaceholder.typicode.com/todos/4"
+  );
+  data4.value = response4.data;
 };
 const fetchData2 = async () => {
   data5.value = await useFetch("https://jsonplaceholder.typicode.com/todos/5");
@@ -29,9 +41,9 @@ const fetchData2 = async () => {
   data8.value = await useFetch("https://jsonplaceholder.typicode.com/todos/8");
 };
 onMounted(async () => {
-  // nexTick() solves the problem
-  fetchData();
-  fetchData2();
+  // await nextTick(); solves the issue
+  await fetchData();
+  await fetchData2();
 });
 </script>
 <template>
@@ -48,6 +60,14 @@ onMounted(async () => {
     <div>
       If you write "await fetchData" in onMounted, first fetch will be missing
       which is data1 but rest will be there.
+    </div>
+    <div>
+      If you change anything in code and save while in dev mode all fetches work
+      for once.
+    </div>
+    <div>
+      I added await in both functions because that should be the correct way.
+      Still first fetch is missing on page refresh
     </div>
     <div>Using nextTick() solves the problem.</div>
     <div class="flex flex-col gap-2 bg-blue-300">
